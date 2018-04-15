@@ -116,18 +116,14 @@ public class Main extends Application {
 		public void handle(ActionEvent event) {
 			// create text for menu item text
 			String text = ((MenuItem) event.getSource()).getText();
-			
+			// check which menu item was selected
 			if (text.equals("Add"))
-//				System.out.println("Switching to add view...");
 				setViewTo(addView);
 			else if (text.equals("Delete"))
-//				System.out.println("Switching to delete view...");
 				setViewTo(deleteView);
 			else if (text.equals("Show"))
-//				System.out.println("Switching to list view...");
 				setViewTo(listView);
 			else if (text.equals("Exit"))
-//				System.out.println("Exiting program...");
 				System.exit(0);
 		}
 		

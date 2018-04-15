@@ -47,8 +47,12 @@ public class ShowView extends BorderPane implements Observer {
 		
 		String[] table = theHashTable.getTable();
 		int i = 0;
-		while (table[i] != null && i != table.length) {
-			states.add(table[i]);
+		states.clear();
+		while (i != table.length) {
+			if (table[i] == null)
+				states.add("");
+			else
+				states.add(table[i]);
 			i++;
 		}
 		list.setItems(states);

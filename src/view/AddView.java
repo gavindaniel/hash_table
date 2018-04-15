@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import model.HashResult;
 import model.HashTable;
 
 public class AddView extends BorderPane implements Observer {
@@ -80,10 +81,13 @@ public class AddView extends BorderPane implements Observer {
 				// TODO: delete/comment out debug statement
 				System.out.println("Adding -> " + text + " to the table...");
 				// add the state to the table
-				// FIXME: implement add method for HashTable
-//				theHashTable.add(text);
+				HashResult hash = theHashTable.hash(text);
 				// set the response text
-				responseText.setText("'" + text + "' add successfully");
+				if (hash.getResult()) // success
+					responseText.setText("'" + text + "' added successfully");
+				else {
+					responseText.setText("'" + text + "' collided at index " + hash.getIndex());
+				}
 			} else {
 				responseText.setText("Please enter a state");
 			}
