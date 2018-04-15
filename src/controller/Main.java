@@ -14,6 +14,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import model.HashTable;
+import view.AddView;
+import view.DeleteView;
 import view.ShowView;
 
 public class Main extends Application {
@@ -55,13 +57,13 @@ public class Main extends Application {
 		theHashTable = new HashTable();
 		
 		// create views
-//		addView = new AddView();
-//		deleteView - new DeleteView();
+		addView = new AddView(theHashTable);
+		deleteView = new DeleteView(theHashTable);
 		listView = new ShowView(theHashTable);
 		
 		// add the views as observers of the model
-//		theHashTable.addObserver(addView);
-//		theHashTable.addObserver(deleteView);
+		theHashTable.addObserver(addView);
+		theHashTable.addObserver(deleteView);
 		theHashTable.addObserver(listView);
 		
 		// set initial view 
@@ -116,14 +118,14 @@ public class Main extends Application {
 			String text = ((MenuItem) event.getSource()).getText();
 			
 			if (text.equals("Add"))
-				System.out.println("Switching to add view...");
-//				setViewTo(addView);
+//				System.out.println("Switching to add view...");
+				setViewTo(addView);
 			else if (text.equals("Delete"))
-				System.out.println("Switching to delete view...");
-//				setViewTo(deleteView);
+//				System.out.println("Switching to delete view...");
+				setViewTo(deleteView);
 			else if (text.equals("Show"))
-				System.out.println("Switching to list view...");
-//				setViewTo(listView);
+//				System.out.println("Switching to list view...");
+				setViewTo(listView);
 			else if (text.equals("Exit"))
 //				System.out.println("Exiting program...");
 				System.exit(0);
