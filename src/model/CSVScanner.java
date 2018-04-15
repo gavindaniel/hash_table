@@ -11,7 +11,7 @@ public class CSVScanner {
 		Scanner scanner = new Scanner(new File("files/mountain.csv"));
 		scanner.useDelimiter(",");
 		while (scanner.hasNext()) {
-			System.out.print(scanner.next()+" | ");
+			System.out.print(scanner.next() + " | ");
 		}
 		scanner.close();
 	}
