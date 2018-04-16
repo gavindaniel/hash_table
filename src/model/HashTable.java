@@ -25,7 +25,7 @@ public class HashTable extends Observable {
 				if (checkDuplicate(temp[i]) == false) {
 					add_result = this.add(temp[i]);
 					if (add_result.getResult() == false) // failure
-						System.out.println("'" + temp[i] + "' collided at index " + add_result.getIndex());
+						System.out.println("Error!\n'" + temp[i] + "' collided at index " + add_result.getIndex());
 					else { // sucess
 		//				System.out.println("'" + temp[i] + "' added successfully");
 					}
@@ -50,9 +50,11 @@ public class HashTable extends Observable {
 	
 	private boolean checkDuplicate(String state) {
 		String[] htable = this.getTable();
+		String temp1, temp2 = state.toLowerCase();
 		for (int i = 0; i < htable.length; i++) {
 			if (htable[i] != null) {
-				if (htable[i].equals(state)) {
+				temp1 = htable[i].toLowerCase();
+				if (temp1.equals(temp2)) {
 					return true;
 				}
 			}
@@ -81,14 +83,16 @@ public class HashTable extends Observable {
 		// variables
 		HashResult delete_result = new HashResult();
 //		HashResult probe_result = new HashResult();
-		int hash_key = 0;
+		int hash_key = 0, probe_hash_key = 0;
 		int count = 0;
 		String[] htable = this.getTable();
 		// generate hash key
 		hash_key = hash(state);
+		String temp1 = state.toLowerCase();
+		String temp2 = htable[hash_key].toLowerCase();
 		// check if the table is empty at the index
 		if (checkEmpty(hash_key) == false) { // the table cell is not empty
-			if (htable[hash_key].equals(state)) { // check that the state to be deleted matches the state at the index in the hash table
+			if (temp2.equals(temp1)) { // check that the state to be deleted matches the state at the index in the hash table
 				htable[hash_key] = null; //"[deleted]"
 				this.setTable(htable);
 				delete_result.setIndex(hash_key);
@@ -98,16 +102,19 @@ public class HashTable extends Observable {
 				notifyObservers();
 			}
 			else { // the state to delete does not match the state at that index in the hash table
-				hash_key = probe(hash_key, state, count);
+				probe_hash_key = probe(hash_key, state, count);
 				// check if the slot is empty
-				while (htable[hash_key] != state && count < 53) {
+				temp2 = htable[probe_hash_key].toLowerCase(); 
+				while (!temp2.equals(temp1) && count < 53) {
 					count++;
-					hash_key = probe(hash_key, state, count);
+					probe_hash_key = probe(hash_key, state, count);
+					if (htable[probe_hash_key] != null)
+						temp2 = htable[probe_hash_key].toLowerCase();
 				}
-				delete_result.setIndex(hash_key);
+				delete_result.setIndex(probe_hash_key);
 				delete_result.setKey(state);
-				if (htable[hash_key].equals(state)) { // check that the state to be deleted matches the state at the index in the hash table
-					htable[hash_key] = null; //"[deleted]"
+				if (temp2.equals(temp1)) { // check that the state to be deleted matches the state at the index in the hash table
+					htable[probe_hash_key] = null; //"[deleted]"
 					this.setTable(htable);
 					delete_result.setResult(true);
 					setChanged();
@@ -123,9 +130,10 @@ public class HashTable extends Observable {
 	private int hash(String state) {
 		// hash key
 		int hash_key = 0;
+		String temp = state.toLowerCase();
 		// hash function
-		for (int i = 0; i < state.length(); i++) {
-			hash_key += state.charAt(i);
+		for (int i = 0; i < temp.length(); i++) {
+			hash_key += temp.charAt(i);
 		}
 		hash_key = hash_key % 53;
 		// return generated hash key

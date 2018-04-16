@@ -83,9 +83,9 @@ public class DeleteView extends BorderPane implements Observer {
 				// add the state to the table
 				HashResult delete_result = theHashTable.delete(text);
 				if (delete_result.getResult() == true) // success
-					responseText.setText("'" + text + "' deleted successfully from index " + delete_result.getIndex());
+					responseText.setText("Success!\n'" + text + "' deleted from index " + delete_result.getIndex());
 				else {
-					responseText.setText("'" + text + "' not found");
+					responseText.setText("Error!\n'" + text + "' not found");
 				}
 			} else {
 				responseText.setText("Please enter a state");
