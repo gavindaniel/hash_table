@@ -26,11 +26,8 @@ public class HashTable extends Observable {
 					add_result = this.add(temp[i]);
 					if (add_result.getResult() == false) // failure
 						System.out.println("Error!\n'" + temp[i] + "' collided at index " + add_result.getIndex());
-					else { // sucess
-		//				System.out.println("'" + temp[i] + "' added successfully");
-					}
 				} else {
-					System.out.println("Duplicate (" + temp[i] + ") found");
+					System.out.println("Error!\nDuplicate (" + temp[i] + ") found at index " + add_result.getIndex());
 				}
 			}
 		}
