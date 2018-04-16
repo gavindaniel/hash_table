@@ -15,23 +15,23 @@ public class HashTable extends Observable {
 		table = new String[size];
 		String[] temp = new String[size];
 		try {
-//			table = CSVScanner.main();
 			temp = CSVScanner.main();
 		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
 			System.out.println("File not found!");
 		}
-//		printTable();
-		HashResult hr = new HashResult();
-		for (int i = 0; i < 53; i ++) {//table.length; i ++) {
+		HashResult add_result = new HashResult();
+		for (int i = 0; i < 53; i ++) {
 			if (temp[i] != null) {
-				hr = hash(temp[i]);
-				if (!hr.getResult()) // failure
-					System.out.println("'" + temp[i] + "' collided at index " + hr.getIndex());
-				else { // sucess
-	//				System.out.println("'" + temp[i] + "' added successfully");
+				if (checkDuplicate(temp[i]) == false) {
+					add_result = this.add(temp[i]);
+					if (add_result.getResult() == false) // failure
+						System.out.println("'" + temp[i] + "' collided at index " + add_result.getIndex());
+					else { // sucess
+		//				System.out.println("'" + temp[i] + "' added successfully");
+					}
+				} else {
+					System.out.println("Duplicate (" + temp[i] + ") found");
 				}
-	//			printTable();
 			}
 		}
 	}
@@ -40,59 +40,149 @@ public class HashTable extends Observable {
 	public String[] getTable() {		return table;	}
 	public void setTable(String[] ht) {	table = ht;	}
 	
-	private boolean add(int index, String state) {
+
+	private boolean checkEmpty(int index) {
+		if (this.getTable()[index] == null) {
+			return true; // empty slot
+		} else 
+			return false;
+	}
+	
+	private boolean checkDuplicate(String state) {
 		String[] htable = this.getTable();
-		if (htable[index] == null) {	// the table cell is empty
+		for (int i = 0; i < htable.length; i++) {
+			if (htable[i] != null) {
+				if (htable[i].equals(state)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private HashResult insert(int index, String state) {
+		HashResult insert_result = new HashResult();
+		insert_result.setIndex(index);
+		insert_result.setKey(state);
+		String[] htable = this.getTable();
+		if (checkEmpty(index)) {	// the table cell is empty
 			htable[index] = state;
 			this.setTable(htable);
+			insert_result.setResult(true);
 			setChanged();
 			notifyObservers();
-			return true;
 		} else {						// the table cell is NOT empty
-			return false;
+			insert_result.setResult(false);
 		}
-		
+		return insert_result;
 	}
 	
-	public HashResult hash(String state) {
-		
-		HashResult hash_result = new HashResult();
-		int key = 0;
-		boolean success = true;
-		
+	public HashResult delete(String state) {
+		// variables
+		HashResult delete_result = new HashResult();
+//		HashResult probe_result = new HashResult();
+		int hash_key = 0;
+		int count = 0;
+		String[] htable = this.getTable();
+		// generate hash key
+		hash_key = hash(state);
+		// check if the table is empty at the index
+		if (checkEmpty(hash_key) == false) { // the table cell is not empty
+			if (htable[hash_key].equals(state)) { // check that the state to be deleted matches the state at the index in the hash table
+				htable[hash_key] = null; //"[deleted]"
+				this.setTable(htable);
+				delete_result.setIndex(hash_key);
+				delete_result.setKey(state);
+				delete_result.setResult(true);
+				setChanged();
+				notifyObservers();
+			}
+			else { // the state to delete does not match the state at that index in the hash table
+				hash_key = probe(hash_key, state, count);
+				// check if the slot is empty
+				while (htable[hash_key] != state && count < 53) {
+					count++;
+					hash_key = probe(hash_key, state, count);
+				}
+				delete_result.setIndex(hash_key);
+				delete_result.setKey(state);
+				if (htable[hash_key].equals(state)) { // check that the state to be deleted matches the state at the index in the hash table
+					htable[hash_key] = null; //"[deleted]"
+					this.setTable(htable);
+					delete_result.setResult(true);
+					setChanged();
+					notifyObservers();
+				} else { // we hit the MAX count limit (53)
+					delete_result.setResult(false);
+				}
+			}
+		}
+		return delete_result;
+	}
+	// function used to generate hash key value 
+	private int hash(String state) {
+		// hash key
+		int hash_key = 0;
+		// hash function
 		for (int i = 0; i < state.length(); i++) {
-			key += state.charAt(i);
+			hash_key += state.charAt(i);
 		}
-		key = key % 53;
-		
-		success = this.add(key, state);
-		
-		if (!success) {
-			success = probe(key, state, 0);
-		}
-		hash_result.setIndex(key);
-		hash_result.setKey(state);
-		hash_result.setResult(success);
-		
-		return hash_result;
+		hash_key = hash_key % 53;
+		// return generated hash key
+		return hash_key;
 	}
 	
-	private boolean probe(int key, String state, int count) {
-		
+	public HashResult add(String state) {
+		// variables
+		HashResult add_result = new HashResult();
+		HashResult insert_result = new HashResult();
+		int probe_hash_key = 0;
+		int hash_key = 0;
+		int count = 0;
+		// first check if this is a duplicate
+		if (checkDuplicate(state) == false) {
+			// generate hash key from state string
+			hash_key = hash(state);
+			// try to insert the state at the generated hash index
+			insert_result = this.insert(hash_key, state);
+			// check for insertion success
+			if (insert_result.getResult() == false) { // original insertion resulted in a collision
+				System.out.println("'" + state + "' collided at index " + insert_result.getIndex());
+				probe_hash_key = probe(hash_key, state, count);
+				while (checkEmpty(probe_hash_key) == false && count < 53) {
+					if (count > 0)
+						System.out.println("'" + state + "' collided at index " + probe_hash_key);
+					count++;
+					probe_hash_key = probe(hash_key, state, count);
+				}
+				add_result.setIndex(probe_hash_key);
+				add_result.setKey(state);
+				insert_result = this.insert(probe_hash_key, state);
+				if (insert_result.getResult() == true) {
+					add_result.setResult(true);
+				}
+				else {
+					add_result.setResult(false);
+				}
+			} else { // original insertion worked 
+				add_result.setIndex(hash_key);
+				add_result.setKey(state);
+				add_result.setResult(true);
+			}
+		}
+		// return the result of add method
+		return add_result;
+	}
+	
+	private int probe(int key, String state, int count) {
+		// variables
+//		HashResult probe_result = new HashResult();
 		int newKey = 0;
-		boolean success = true;
-		
+		// quadratic probing function
 		newKey = key + (count*count);
 		newKey = newKey % 53;
-		
-		success = this.add(newKey, state);
-		
-		if (success) {
-			return true;
-		} else if (!success && count != 53) {
-			probe(key, state, count+1);
-		}  //else 
-		return false;
+		// return the new hash key
+		return newKey;
 	}
 	
 	private void printTable() {

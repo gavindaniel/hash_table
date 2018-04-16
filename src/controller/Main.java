@@ -82,13 +82,10 @@ public class Main extends Application {
 		MenuItem delete_MI = new MenuItem("Delete");
 		MenuItem list_MI = new MenuItem("Show");
 		MenuItem exit_MI = new MenuItem("Exit");
-		
 		// create menu
 		Menu menu = new Menu("Options");
-		
 		// add menu items to menu
 		menu.getItems().addAll(add_MI, delete_MI, list_MI, exit_MI);
-		
 		// create menu bar
 		menuBar = new MenuBar();
 		// add menu to menu bar

@@ -81,12 +81,15 @@ public class AddView extends BorderPane implements Observer {
 				// TODO: delete/comment out debug statement
 				System.out.println("Adding -> " + text + " to the table...");
 				// add the state to the table
-				HashResult hash = theHashTable.hash(text);
+				HashResult add_result = theHashTable.add(text);
 				// set the response text
-				if (hash.getResult()) // success
+				if (add_result.getResult() == true) // success
 					responseText.setText("'" + text + "' added successfully");
+				else if (add_result.getResult() == false && add_result.getKey().equals("")) { // duplicate found
+					responseText.setText("'" + text + "' was ignored. Duplicate found.");
+				}
 				else {
-					responseText.setText("'" + text + "' collided at index " + hash.getIndex());
+					responseText.setText("'" + text + "' collided at index " + add_result.getIndex());
 				}
 			} else {
 				responseText.setText("Please enter a state");

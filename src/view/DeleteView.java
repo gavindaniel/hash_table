@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import model.HashResult;
 import model.HashTable;
 
 public class DeleteView extends BorderPane implements Observer {
@@ -80,10 +81,12 @@ public class DeleteView extends BorderPane implements Observer {
 				// TODO: delete/comment out debug statement
 				System.out.println("Deleting -> " + text + " from the table...");
 				// add the state to the table
-				// FIXME: implement delete method for HashTable
-//				theHashTable.delete(text);
-				// set the response text
-				responseText.setText("'" + text + "' deleted successfully");
+				HashResult delete_result = theHashTable.delete(text);
+				if (delete_result.getResult() == true) // success
+					responseText.setText("'" + text + "' deleted successfully from index " + delete_result.getIndex());
+				else {
+					responseText.setText("'" + text + "' not found");
+				}
 			} else {
 				responseText.setText("Please enter a state");
 			}
